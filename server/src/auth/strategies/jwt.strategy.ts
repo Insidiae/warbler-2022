@@ -13,7 +13,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		});
 	}
 
+	//? Based on the way JWT signing works, we're guaranteed that we're receiving
+	//? a valid token that we have previously signed and issued to a valid user.
+	//? https://docs.nestjs.com/security/authentication#implementing-passport-jwt
 	async validate(payload: any) {
-		return { userId: payload.sub, username: payload.username };
+		//* This attaches a `user` object to the request (e.g. `req.user`)
+		return { id: payload.userId };
 	}
 }

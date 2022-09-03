@@ -1,12 +1,43 @@
-import { Controller, Post } from "@nestjs/common";
+import {
+	Controller,
+	Post,
+	UseGuards,
+	Param,
+	Body,
+	Get,
+	Delete,
+} from "@nestjs/common";
 import { WarblesService } from "./warbles.service";
 
-@Controller("users/:id/warbles")
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { EnsureCorrectUserGuard } from "../auth/guards/ensure-correct-user.guard";
+
+@Controller("users/:userId/warbles")
 export class WarblesController {
 	constructor(private warblesService: WarblesService) {}
 
+	@Get()
+	getAllWarbles(@Param("userId") userId: string) {
+		return this.warblesService.getAllWarbles(userId);
+	}
+
 	@Post()
-	createMessage(): string {
-		return this.warblesService.createMessage();
+	@UseGuards(JwtAuthGuard, EnsureCorrectUserGuard)
+	createWarble(
+		@Param("userId") userId: string,
+		@Body() { warble }: { warble: string },
+	) {
+		return this.warblesService.createWarble(userId, warble);
+	}
+
+	@Get(":warbleId")
+	getWarble(@Param("warbleId") warbleId: string) {
+		return this.warblesService.getWarble(warbleId);
+	}
+
+	@Delete(":warbleId")
+	@UseGuards(JwtAuthGuard, EnsureCorrectUserGuard)
+	deleteWarble(@Param("warbleId") warbleId: string) {
+		return this.warblesService.deleteWarble(warbleId);
 	}
 }

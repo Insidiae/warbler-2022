@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { User, Prisma } from "@prisma/client";
 import * as bcrypt from "bcrypt";
@@ -61,12 +61,8 @@ export class AuthService {
 		} catch (e) {
 			if (e instanceof Prisma.PrismaClientKnownRequestError) {
 				if (e.code === "P2002") {
-					throw new HttpException(
-						{
-							status: HttpStatus.BAD_REQUEST,
-							error: `Sorry, that ${e.meta.target} is already taken.`,
-						},
-						HttpStatus.BAD_REQUEST,
+					throw new BadRequestException(
+						`Sorry, that ${e.meta.target} is already taken.`,
 					);
 				}
 			}

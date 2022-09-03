@@ -11,9 +11,18 @@ datasource db {
 }
 
 model User {
-  id              String  @id @default(auto()) @map("_id") @db.ObjectId
-  email           String  @unique
-  username        String  @unique
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  email           String    @unique
+  username        String    @unique
   password        String
   profileImageUrl String?
+  warbles         Warble[] @relation("UserWarble")
+}
+
+model Warble {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime   @default(now())
+  warble  String
+  user    User    @relation(references: [id], fields: [userId], onDelete: Cascade, "UserWarble")
+  userId  String  @db.ObjectId
 }
