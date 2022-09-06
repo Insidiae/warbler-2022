@@ -21,12 +21,19 @@ type SignupRequest = {
 	profileImageUrl?: string;
 };
 
-type Warble = {
+type CreateWarbleRequest = {
+	userId: string;
+	formData: {
+		warble: string;
+	};
+};
+
+export type Warble = {
 	id: string;
 	createdAt: string;
 	warble: string;
 	userId: string;
-	user?: {
+	user: {
 		username: string;
 		profileImageUrl: string | null;
 	};
@@ -44,6 +51,7 @@ export const api = createApi({
 			return headers;
 		},
 	}),
+	tagTypes: ["Warble"],
 	reducerPath: "warblerApi",
 	endpoints: (builder) => ({
 		signin: builder.mutation<UserResponse, SigninRequest>({
@@ -62,11 +70,51 @@ export const api = createApi({
 		}),
 		getAllUserWarbles: builder.query<Warble[], string>({
 			query: (userId) => ({ url: `users/${userId}/warbles` }),
+			providesTags: (result) =>
+				result
+					? [
+							...result.map(({ id }) => ({ type: "Warble" as const, id })),
+							"Warble",
+					  ]
+					: ["Warble"],
 		}),
 		getAllWarbles: builder.query<Warble[], void>({
 			query: () => ({
 				url: `warbles`,
 			}),
+			providesTags: (result) =>
+				result
+					? [
+							...result.map(({ id }) => ({ type: "Warble" as const, id })),
+							"Warble",
+					  ]
+					: ["Warble"],
+		}),
+		getWarble: builder.query<Warble, { userId: string; warbleId: string }>({
+			query: ({ userId, warbleId }) => ({
+				url: `users/${userId}/warbles/${warbleId}`,
+			}),
+		}),
+		createWarble: builder.mutation<Warble, CreateWarbleRequest>({
+			query: (req) => ({
+				url: `users/${req.userId}/warbles`,
+				method: "POST",
+				body: req.formData,
+			}),
+			invalidatesTags: ["Warble"],
+		}),
+		deleteWarble: builder.mutation<
+			Warble,
+			{ userId: string; warbleId: string }
+		>({
+			query: ({ userId, warbleId }) => ({
+				url: `users/${userId}/warbles/${warbleId}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result) =>
+				result
+					? [{ type: "Warble" as const, id: result.id }, "Warble"]
+					: ["Warble"],
 		}),
 	}),
 });
@@ -76,4 +124,7 @@ export const {
 	useSignupMutation,
 	useGetAllUserWarblesQuery,
 	useGetAllWarblesQuery,
+	useGetWarbleQuery,
+	useCreateWarbleMutation,
+	useDeleteWarbleMutation,
 } = api;

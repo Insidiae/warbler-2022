@@ -16,6 +16,14 @@ export class WarblesService {
 			where: {
 				userId,
 			},
+			include: {
+				user: {
+					select: {
+						username: true,
+						profileImageUrl: true,
+					},
+				},
+			},
 			orderBy: {
 				createdAt: "desc",
 			},
@@ -53,6 +61,14 @@ export class WarblesService {
 		const warble = await this.prisma.warble.findUnique({
 			where: {
 				id: warbleId,
+			},
+			include: {
+				user: {
+					select: {
+						username: true,
+						profileImageUrl: true,
+					},
+				},
 			},
 		});
 

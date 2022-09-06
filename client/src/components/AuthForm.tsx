@@ -1,10 +1,13 @@
 import * as React from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { useSigninMutation, useSignupMutation } from "../store/services/api";
-import { setCredentials } from "../store/auth/authSlice";
+import { selectIsLoggedIn, setCredentials } from "../store/auth/authSlice";
 
 import type { UserResponse } from "../store/services/api";
+
+import { isFetchBaseQueryErrorWithMessage } from "../utils/helpers";
 
 import warblerLogo from "../assets/warbler-logo.png";
 
@@ -45,12 +48,23 @@ export default function AuthForm({
 	heading,
 	isSignUp,
 }: AuthFormProps) {
+	const isLoggedIn = useSelector(selectIsLoggedIn);
+	const navigate = useNavigate();
+
+	React.useEffect(() => {
+		if (isLoggedIn) {
+			navigate("/", { replace: true });
+		}
+	}, [isLoggedIn, navigate]);
+
 	const [form, setForm] = React.useReducer(authFormReducer, initialState);
 
 	const dispatch = useDispatch();
 
-	const [signin, { status: signinStatus }] = useSigninMutation();
-	const [signup, { status: signupStatus }] = useSignupMutation();
+	const [signin, { status: signinStatus, error: signinError }] =
+		useSigninMutation();
+	const [signup, { status: signupStatus, error: signupError }] =
+		useSignupMutation();
 
 	function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
 		setForm({
@@ -74,12 +88,14 @@ export default function AuthForm({
 				setCredentials({
 					user: {
 						id: res.userId,
+						username: res.username,
+						profileImageUrl: res.profileImageUrl,
 					},
 					token: res.access_token,
 				})
 			);
 		} catch {
-			//TODO: Handle auth rejection (maybe using the mutation `status`?)
+			//? Auth rejection is handled via the `useMutation()` hook
 		}
 	}
 
@@ -166,6 +182,32 @@ export default function AuthForm({
 								</>
 							) : null}
 						</div>
+
+						{signinStatus === "rejected" || signupStatus === "rejected" ? (
+							<div className="alert alert-error shadow-lg">
+								<div>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="stroke-current flex-shrink-0 h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="2"
+											d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+									{isFetchBaseQueryErrorWithMessage(signinError) ? (
+										<span>{signinError.data.message}</span>
+									) : null}
+									{isFetchBaseQueryErrorWithMessage(signupError) ? (
+										<span>{signupError.data.message}</span>
+									) : null}
+								</div>
+							</div>
+						) : null}
 
 						<div>
 							<button type="submit" className="btn btn-primary w-full">

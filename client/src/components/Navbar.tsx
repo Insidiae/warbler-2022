@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { selectIsLoggedIn, clearCredentials } from "../store/auth/authSlice";
 
@@ -9,6 +9,12 @@ import warblerLogo from "../assets/warbler-logo.png";
 export default function Navbar() {
 	const isLoggedIn = useSelector(selectIsLoggedIn);
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
+	function signOut() {
+		dispatch(clearCredentials());
+		navigate("/");
+	}
 
 	return (
 		<div className="navbar bg-base-100">
@@ -20,11 +26,14 @@ export default function Navbar() {
 			<div className="flex-none">
 				<ul className="menu menu-horizontal p-0 capitalize font-bold">
 					{isLoggedIn ? (
-						<li>
-							<button onClick={() => dispatch(clearCredentials())}>
-								Sign Out
-							</button>
-						</li>
+						<>
+							<li>
+								<Link to="/new-warble">New Warble</Link>
+							</li>
+							<li>
+								<button onClick={signOut}>Sign Out</button>
+							</li>
+						</>
 					) : (
 						<>
 							<li>

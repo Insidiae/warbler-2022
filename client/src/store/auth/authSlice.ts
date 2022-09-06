@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
-type User = {
+export type User = {
 	id: string;
+	username: string;
+	profileImageUrl: string | null;
 };
 
 type AuthState = {
@@ -41,5 +43,9 @@ export const selectIsLoggedIn = createSelector(
 	selectAuthSlice,
 	(auth) => !!auth.token
 );
+
+export const selectUser = createSelector(selectAuthSlice, (auth) => auth.user);
+
+export const selectUserId = createSelector(selectUser, (user) => user?.id);
 
 export default authSlice.reducer;
