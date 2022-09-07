@@ -6,6 +6,7 @@ import HomeRoute from "./routes/HomeRoute";
 import AuthForm from "./components/AuthForm";
 import NewWarbleRoute from "./routes/NewWarbleRoute";
 import WarbleRoute from "./routes/WarbleRoute";
+import UserProfileRoute from "./routes/UserProfileRoute";
 
 function App() {
 	return (
@@ -36,6 +37,7 @@ function App() {
 				/>
 				<Route path="new-warble" element={<NewWarbleRoute />} />
 				<Route path=":userId">
+					<Route index element={<UserProfileRoute />} />
 					<Route path="warbles/:warbleId" element={<WarbleRoute />} />
 				</Route>
 			</Routes>

@@ -39,6 +39,12 @@ export type Warble = {
 	};
 };
 
+export type UserProfile = {
+	username: string;
+	profileImageUrl: string | null;
+	warbles: Omit<Warble, "user">[];
+};
+
 export const api = createApi({
 	baseQuery: fetchBaseQuery({
 		baseUrl: import.meta.env.VITE_API_ENDPOINT_URL,
@@ -68,12 +74,15 @@ export const api = createApi({
 				body: credentials,
 			}),
 		}),
-		getAllUserWarbles: builder.query<Warble[], string>({
+		getAllUserWarbles: builder.query<UserProfile, string>({
 			query: (userId) => ({ url: `users/${userId}/warbles` }),
 			providesTags: (result) =>
 				result
 					? [
-							...result.map(({ id }) => ({ type: "Warble" as const, id })),
+							...result.warbles.map(({ id }) => ({
+								type: "Warble" as const,
+								id,
+							})),
 							"Warble",
 					  ]
 					: ["Warble"],

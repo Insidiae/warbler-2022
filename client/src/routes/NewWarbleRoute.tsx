@@ -2,24 +2,19 @@ import * as React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { selectIsLoggedIn, selectUserId } from "../store/auth/authSlice";
+import { selectUserId } from "../store/auth/authSlice";
 import { useCreateWarbleMutation } from "../store/services/api";
 import { isFetchBaseQueryErrorWithMessage } from "../utils/helpers";
+import useRequireLogin from "../utils/hooks/useRequireLogin";
 
 type WarbleFormInputs = {
 	warble: { value: string };
 };
 
 export default function NewWarbleRoute() {
-	const isLoggedIn = useSelector(selectIsLoggedIn);
+	useRequireLogin();
+
 	const navigate = useNavigate();
-
-	React.useEffect(() => {
-		if (!isLoggedIn) {
-			navigate("/signin", { replace: true });
-		}
-	}, [isLoggedIn, navigate]);
-
 	const userId = useSelector(selectUserId) as string;
 	const [createWarble, { error, status }] = useCreateWarbleMutation();
 

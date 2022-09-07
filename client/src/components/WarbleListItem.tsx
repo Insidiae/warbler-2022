@@ -17,7 +17,7 @@ export default function WarbleListItem({ warble }: { warble: Warble }) {
 
 	return (
 		<div className="card card-compact bg-neutral shadow-xl hover:bg-neutral-focus sm:card-side w-full">
-			<Link to={`/`}>
+			<Link to={`/${warble.userId}`}>
 				<figure className="p-3">
 					<img
 						src={warble.user.profileImageUrl ?? defaultProfileImage}
@@ -29,7 +29,10 @@ export default function WarbleListItem({ warble }: { warble: Warble }) {
 			<div className="card-body">
 				<div className="flex flex-col text-center sm:text-left">
 					<span>
-						<Link to={`/`} className="text-primary mr-2 hover:underline">
+						<Link
+							to={`/${warble.userId}`}
+							className="text-primary mr-2 hover:underline"
+						>
 							@{warble.user.username}
 						</Link>
 						<Link

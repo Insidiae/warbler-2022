@@ -11,23 +11,38 @@ import { PrismaService } from "../prisma/prisma.service";
 export class WarblesService {
 	constructor(private prisma: PrismaService) {}
 
-	async getAllWarbles(userId: string) {
-		return await this.prisma.warble.findMany({
-			where: {
-				userId,
-			},
-			include: {
-				user: {
-					select: {
-						username: true,
-						profileImageUrl: true,
+	async getAllUserWarbles(userId: string) {
+		try {
+			const user = await this.prisma.user.findUnique({
+				where: {
+					id: userId,
+				},
+				select: {
+					username: true,
+					profileImageUrl: true,
+					warbles: {
+						orderBy: {
+							createdAt: "desc",
+						},
 					},
 				},
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
+			});
+
+			if (!user) {
+				throw new NotFoundException("User Not Found");
+			}
+
+			return user;
+		} catch (e) {
+			if (e instanceof Prisma.PrismaClientKnownRequestError) {
+				if (e.code === "P2023") {
+					throw new NotFoundException("User Not Found");
+				}
+			}
+
+			//? just re-throw all other kinds of errors for now...
+			throw e;
+		}
 	}
 
 	async createWarble(userId: string, warble: string) {
@@ -58,25 +73,35 @@ export class WarblesService {
 	}
 
 	async getWarble(warbleId: string) {
-		const warble = await this.prisma.warble.findUnique({
-			where: {
-				id: warbleId,
-			},
-			include: {
-				user: {
-					select: {
-						username: true,
-						profileImageUrl: true,
+		try {
+			const warble = await this.prisma.warble.findUnique({
+				where: {
+					id: warbleId,
+				},
+				include: {
+					user: {
+						select: {
+							username: true,
+							profileImageUrl: true,
+						},
 					},
 				},
-			},
-		});
+			});
 
-		if (!warble) {
-			throw new NotFoundException("Warble Not Found");
+			if (!warble) {
+				throw new NotFoundException("Warble Not Found");
+			}
+
+			return warble;
+		} catch (e) {
+			if (e instanceof Prisma.PrismaClientKnownRequestError) {
+				if (e.code === "P2023") {
+					throw new NotFoundException("Warble Not Found");
+				}
+			}
+
+			throw e;
 		}
-
-		return warble;
 	}
 
 	async deleteWarble(warbleId: string) {

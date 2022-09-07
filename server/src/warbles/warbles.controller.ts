@@ -18,7 +18,7 @@ export class WarblesController {
 
 	@Get()
 	getAllWarbles(@Param("userId") userId: string) {
-		return this.warblesService.getAllWarbles(userId);
+		return this.warblesService.getAllUserWarbles(userId);
 	}
 
 	@Post()
