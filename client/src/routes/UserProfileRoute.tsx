@@ -23,7 +23,7 @@ export default function UserProfileRoute() {
 			{userProfile ? (
 				<>
 					<img
-						src={userProfile.profileImageUrl ?? defaultProfileImage}
+						src={userProfile.profileImageUrl || defaultProfileImage}
 						alt="Your profile photo"
 						className="w-60 max-w-full aspect-square mb-2 border-4 border-base-content object-cover rounded-full"
 					/>

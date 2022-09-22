@@ -16,7 +16,7 @@ export default function UserAside() {
 	return (
 		<div className="hidden sticky top-4 self-start sm:flex flex-col items-center">
 			<img
-				src={profileImageUrl ?? defaultProfileImage}
+				src={profileImageUrl || defaultProfileImage}
 				alt="Your profile photo"
 				className="w-60 max-w-full aspect-square mb-2 border-4 border-base-content object-cover rounded-full"
 			/>

@@ -20,7 +20,7 @@ export default function WarbleListItem({ warble }: { warble: Warble }) {
 			<Link to={`/${warble.userId}`}>
 				<figure className="p-3">
 					<img
-						src={warble.user.profileImageUrl ?? defaultProfileImage}
+						src={warble.user.profileImageUrl || defaultProfileImage}
 						alt={`${warble.user.username}'s profile photo`}
 						className="w-24 h-24 object-cover rounded-full sm:w-16 sm:h-16"
 					/>
